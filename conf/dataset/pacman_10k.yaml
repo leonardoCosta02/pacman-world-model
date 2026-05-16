@@ -1,0 +1,7 @@
+name: pacman_10k
+num_frames: 10000
+danger_window: 15
+seed: 42
+cache_path: "data/raw_frames_10k.npz"
+train_split: 0.8
+seq_len: 8

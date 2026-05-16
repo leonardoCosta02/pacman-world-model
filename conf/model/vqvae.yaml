@@ -1,0 +1,14 @@
+name: vqvae
+num_embeddings: 128
+embedding_dim: 64
+commitment_cost: 1.0
+ema_decay: 0.99
+training:
+  epochs: 50
+  learning_rate: 1.0e-3
+  weight_decay: 1.0e-4
+  alpha_mse: 25.0
+  beta_ce: 1.0
+  scheduler_step: 15
+  scheduler_gamma: 0.5
+  class_weight_danger: 3.0

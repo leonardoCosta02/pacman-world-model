@@ -1,0 +1,14 @@
+name: frame_prior
+d_model: 256
+nhead: 8
+num_layers: 4
+dropout: 0.1
+target_len: 1
+training:
+  epochs: 30
+  learning_rate: 1.0e-4
+  weight_decay: 1.0e-4
+  batch_size: 16
+  scheduler_step: 10
+  scheduler_gamma: 0.5
+  vqvae_checkpoint: "checkpoints/vqvae.pth"

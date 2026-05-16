@@ -1,0 +1,21 @@
+defaults:
+  - model: baseline
+  - dataset: pacman_10k
+  - _self_
+
+hydra:
+  run:
+    dir: ./outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+
+training:
+  seed: 42
+  device: "cuda"
+  batch_size: 32
+  num_workers: 2
+  checkpoint_dir: "checkpoints"
+
+wandb:
+  project: "DLPROJECT"
+  entity: null
+  mode: "online"
+  name: null

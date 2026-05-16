@@ -1,0 +1,44 @@
+# Byte-compiled
+__pycache__/
+*.py[codz]
+*$py.class
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Environments
+.env
+.venv
+venv/
+env/
+
+# Hydra outputs
+outputs/
+multirun/
+
+# WandB local logs
+wandb/
+
+# Large data files
+*.zip
+*.npz
+data/
+raw_frames_*.npz
+
+# PyTorch Models
+*.pth
+*.pt
+checkpoints/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

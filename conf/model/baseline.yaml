@@ -1,0 +1,8 @@
+name: baseline
+latent_dim: 64
+training:
+  epochs: 10
+  learning_rate: 1.0e-3
+  weight_decay: 1.0e-4
+  alpha_mse: 10.0
+  beta_bce: 1.0
