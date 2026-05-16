@@ -94,7 +94,7 @@ def main(cfg: DictConfig):
         print(f"  Epoch {epoch+1}: tot={ep_tot:.4f}, mse={ep_mse:.6f}, bce={ep_bce:.4f}")
 
     # Save checkpoint
-    ckpt_path = os.path.join(cfg.training.checkpoint_dir, "baseline.pth")
+    ckpt_path = os.path.join(cfg.training.checkpoint_dir, "baseline_checkpoint.pth")
     torch.save({'model_state_dict': model.state_dict(), 'history': history}, ckpt_path)
     print(f"Saved checkpoint to {ckpt_path}")
 
