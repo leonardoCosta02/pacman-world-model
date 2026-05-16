@@ -99,7 +99,7 @@ def main(cfg: DictConfig):
     ).to(device)
 
     os.makedirs(cfg.training.checkpoint_dir, exist_ok=True)
-    ckpt_path = os.path.join(cfg.training.checkpoint_dir, "transformer_classifier.pth")
+    ckpt_path = os.path.join(cfg.training.checkpoint_dir, "transformer_classifier_checkpoint.pth.pth")
 
     history = {'ce': [], 'acc_train': [], 'acc_test': [], 'lr': []}
     print(f"Training Temporal Transformer Classifier on {device}...")
