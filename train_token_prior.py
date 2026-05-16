@@ -105,7 +105,7 @@ def main(cfg: DictConfig):
     )
 
     os.makedirs(cfg.training.checkpoint_dir, exist_ok=True)
-    ckpt_path = os.path.join(cfg.training.checkpoint_dir, "token_prior.pth")
+    ckpt_path = os.path.join(cfg.training.checkpoint_dir, "transformer_prior_checkpoint.pth")
 
     history = {'vocab_loss': [], 'lr': [], 'noise_prob': [], 'ss_prob': []}
     print(f"Training Token-level Prior on {device}...")
