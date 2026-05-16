@@ -68,7 +68,7 @@ def main(cfg: DictConfig):
     ).to(device)
 
     os.makedirs(cfg.training.checkpoint_dir, exist_ok=True)
-    ckpt_path = os.path.join(cfg.training.checkpoint_dir, "vqvae.pth")
+    ckpt_path = os.path.join(cfg.training.checkpoint_dir, "vqvae_checkpoint.pth")
 
     history = {'tot': [], 'mse': [], 'ce': [], 'vq': [], 'lr': [], 'active_tokens': []}
     print(f"Training VQ-VAE on {device}...")
