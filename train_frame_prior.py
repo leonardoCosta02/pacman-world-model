@@ -89,7 +89,7 @@ def main(cfg: DictConfig):
     )
 
     os.makedirs(cfg.training.checkpoint_dir, exist_ok=True)
-    ckpt_path = os.path.join(cfg.training.checkpoint_dir, "frame_prior.pth")
+    ckpt_path = os.path.join(cfg.training.checkpoint_dir, "frame_prior_checkpoint.pth")
 
     history = {'train_mse': [], 'test_mse': [], 'lr': []}
     print(f"Training Frame-level Prior on {device}...")
