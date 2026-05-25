@@ -1,113 +1,115 @@
-# Multitask World Model per Ms. Pac-Man
+# Multitask World Model for Ms. Pac-Man
 
-Progetto sviluppato per il corso **Deep Learning & Applied AI (DLAI) 2025/2026** presso Sapienza Università di Roma, Prof. Rodolà.
+Project developed for the **Deep Learning & Applied AI (DLAI) 2025/2026** course at Sapienza University of Rome, under the supervision of Prof. Emanuele Rodolà.
 
-## Panoramica
+## Overview
 
-Sistema multitask basato su Encoder + due teste (Decoder + Classifier), esteso con VQ-VAE, Temporal Transformer e modelli generativi autoregressivi (Token-level Prior e Frame-level Prior). Il sistema costruisce un *World Model* capace di codificare, ricostruire, classificare e generare frame del gioco Ms. Pac-Man.
+A multitask system based on a shared Encoder and two heads (Decoder + Classifier), progressively extended with a VQ-VAE, a Temporal Transformer, and two autoregressive generative models (Token-level Prior and Frame-level Prior). The system builds a *World Model* capable of encoding, reconstructing, classifying, and generating future frames of the Ms. Pac-Man arcade game.
 
-## Struttura del progetto
+## Project Structure
 
-\`\`\`
-pacman-world-model/
-├── src/                       # Codice sorgente modulare
-│   ├── utils.py               # set_seed, make_averager, helpers
-│   ├── dataset.py             # Raccolta frame, Dataset PyTorch
-│   ├── models.py              # Baseline, VectorQuantizer, VQVAE
-│   └── transformers.py        # Temporal Classifier, Token Prior, Frame Prior
-├── conf/                      # Configurazioni Hydra
-│   ├── config.yaml
-│   ├── model/                 # Iperparametri per modello
-│   └── dataset/               # Configurazioni dataset (10k, 50k)
-├── notebook/                  # Notebook esplorativo (launcher)
-│   └── PacMan_WorldModel.ipynb
-├── train_baseline.py          # Training script Baseline
-├── train_vqvae.py             # Training script VQ-VAE
-├── train_transformer.py       # Training script Temporal Transformer
-├── train_token_prior.py       # Training script Token Prior
-├── train_frame_prior.py       # Training script Frame Prior
-└── test.py                    # Valutazione modelli sul test set
-\`\`\`
+* `src/` - Modular source code
+  * `utils.py` - set_seed, make_averager, helpers
+  * `dataset.py` - Frame collection, PyTorch Datasets, DataLoaders
+  * `models.py` - Baseline, VectorQuantizer, VQ-VAE
+  * `transformers.py` - Temporal Classifier, Token Prior, Frame Prior
+* `conf/` - Hydra configurations
+  * `config.yaml` - Main config file
+  * `model/` - Hyperparameters for each model
+  * `dataset/` - Dataset configs (10k, 50k)
+* `notebook/` - Exploratory notebook (launcher)
+  * `PacMan_WorldModel.ipynb`
+* `train_baseline.py` - Baseline training script
+* `train_vqvae.py` - VQ-VAE training script
+* `train_transformer.py` - Temporal Transformer training script
+* `train_token_prior.py` - Token-level Prior training script
+* `train_frame_prior.py` - Frame-level Prior training script
+* `test.py` - Evaluation script for test set metrics
 
-> **Nota**: il notebook è un launcher minimale che importa il codice da `src/` e lancia i `train_*.py`. Tutto il codice del progetto è nei file modulari Python.
+> **Note**: The notebook acts as a minimal launcher that imports the code from `src/` and runs the training/evaluation pipelines. The core architecture and logic strictly reside in the modular Python files.
 
-## Installazione
+## Installation
 
-\`\`\`bash
-git clone https://github.com/leonardoCosta02/pacman-world-model.git
+```bash
+git clone [https://github.com/leonardoCosta02/pacman-world-model.git](https://github.com/leonardoCosta02/pacman-world-model.git)
 cd pacman-world-model
 pip install -r requirements.txt
-\`\`\`
+## Usage
 
-## Uso
+### Training (Sequential Order)
 
-### Training (ordine obbligato)
+The models must be trained sequentially because each relies on the previous one (e.g., the Transformers use the pre-trained VQ-VAE as a frozen feature extractor):
 
-I modelli devono essere addestrati in sequenza perché ciascuno dipende dal precedente (i Transformer usano il VQ-VAE come feature extractor frozen):
-
-\`\`\`bash
+```bash
 # 1. Baseline multitask
 python train_baseline.py
 
-# 2. VQ-VAE (richiede il dataset 10k già raccolto)
+# 2. VQ-VAE (requires the 10k dataset)
 python train_vqvae.py
 
-# 3. Temporal Transformer Classifier (usa VQ-VAE frozen)
+# 3. Temporal Transformer Classifier (uses frozen VQ-VAE)
 python train_transformer.py
 
-# 4. Token-level Prior (usa VQ-VAE frozen)
+# 4. Token-level Prior (uses frozen VQ-VAE)
 python train_token_prior.py
 
-# 5. Frame-level Prior (richiede dataset 50k)
+# 5. Frame-level Prior (requires the 50k dataset)
 python train_frame_prior.py dataset=pacman_50k
-\`\`\`
+### Evaluation
 
-### Valutazione
+To evaluate the classifiers on the test set and extract Accuracy, Precision, Recall, and F1 scores:
 
-\`\`\`bash
+```bash
 python test.py model=baseline
 python test.py model=vqvae
 python test.py model=transformer_classifier
-\`\`\`
+### Exploratory Notebook
 
-### Notebook
+For interactive visual analysis, latent space interpolations, and generative rollouts:
 
-Per un'analisi visiva interattiva con tutti i test, le interpolazioni latenti e i rollout generativi:
-
-\`\`\`bash
+```bash
 jupyter notebook notebook/PacMan_WorldModel.ipynb
-\`\`\`
-
-Il notebook è multi-ambiente: rileva automaticamente Kaggle / Colab / locale e configura i path di conseguenza.
-
 ## Pre-trained Weights
 
-Per eseguire il notebook senza riaddestrare i modelli da zero, i pesi pre-addestrati sono disponibili su:
+To run the notebook or evaluation scripts without retraining from scratch, pre-trained weights are available:
 
-- **Kaggle Models** (pubblici): cerca `leonardocostantini02/modeels`, `modeels2`, `modeels3` e il dataset `dataseets`
-- **Google Drive** (cartella `pacman-pesi`): per Colab
+- **Kaggle Models (Public):** search for `leonardocostantini02/modeels`, `modeels2`, `modeels3`, and the dataset `dataseets`.
+- **Google Drive (`pacman-pesi` folder):** for Google Colab integration.
 
-Configurazione per ambiente:
-- **Kaggle**: attacca i Kaggle Models dal pannello "Add Input"
-- **Colab**: copia i file `.pth` in `/content/drive/MyDrive/pacman-pesi/`
-- **Locale**: salva i file `.pth` in `checkpoints/`
+**Environment Setup:**
 
-## Risultati
+- **Kaggle:** Attach the Kaggle Models via the "Add Input" panel.
+- **Colab:** Copy the `.pth` files into `/content/drive/MyDrive/pacman-pesi/`.
+- **Local:** Save the `.pth` files inside the `checkpoints/` directory.
 
-| Modello | Input | Test Accuracy | F1 DANGER |
-|---|---|---|---|
-| Baseline (continuo) | 1 frame | 92.40% | 0.62 |
-| VQ-VAE (discreto) | 1 frame | 96.00% | 0.76 |
-| Temporal Transformer | 8 frame | **97.85%** | **0.83** |
+## Experimental Results
 
-**Pruning** del VQ-VAE encoder al 20% (L1 Unstructured Global): accuracy preservata (97.85%), sparsità globale del 20%.
+### Classification
 
-**Generazione autoregressiva**: il Frame-level Prior produce 15 frame coerenti, mantenendo la struttura del labirinto. Il Token-level Prior soffre invece di error accumulation dopo 1-2 frame.
+Adding temporal context drastically improves the detection of the rare DANGER class, significantly reducing false positives.
 
-## Riproducibilità
+| Model | Input | Test Accuracy | F1 (DANGER) |
+| :--- | :--- | :--- | :--- |
+| Baseline (Continuous) | 1 frame | 92.40% | 0.62 |
+| VQ-VAE (Discrete) | 1 frame | 96.00% | 0.76 |
+| Temporal Transformer | 8 frames | **97.85%** | **0.83** |
 
-Tutti i seed sono fissati a 42 (`numpy`, `torch`, `cuda`, `cudnn` deterministico). Lo split train/test e i `WeightedRandomSampler` usano `Generator` espliciti. L'init di ogni modello viene riseedato per garantire riproducibilità anche con esecuzioni in ordini diversi.
+*Inference Benchmark:* The Temporal Transformer processes 8-frame sequences in 1.48 ms on a T4 GPU (675 sequences/sec), performing well within real-time 60 FPS constraints.
 
-## Autore
+### Pruning
 
-Leonardo Costantini --- Sapienza Università di Roma --- DLAI 2025/2026
+Applying a 20% L1 Unstructured Global Pruning to the VQ-VAE encoder leaves downstream accuracy completely intact (97.85%). The sparsity disproportionately targets the largest convolutional layer (23%) while preserving the edge-detecting first layer (2.9%), indicating a healthy over-parameterization for the multitask objective.
+
+### Generative Priors
+
+- **Frame-level Prior:** Generates full latents in a single pass, maintaining coherent maze structures for 15+ steps. However, the MSE objective induces regression-to-the-mean, blurring moving entities.
+- **Token-level Prior:** Generates locally coherent structures but requires 100 autoregressive steps per frame, leading to exposure bias and rapid categorical drift after 1-2 frames.
+
+## Reproducibility
+
+All random seeds are strictly set to 42 (`numpy`, `random`, `torch`, `cuda`, and deterministic `cudnn`). Train/test splits and `WeightedRandomSampler` instances use explicit PyTorch Generators. Model initialization is re-seeded before instantiation to guarantee perfectly reproducible weights regardless of the execution order.
+
+## Author
+
+**Leonardo Costantini** - Computer Science Student — Sapienza University of Rome  
+Deep Learning & Applied AI (2025/2026)
