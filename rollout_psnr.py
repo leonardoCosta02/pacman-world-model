@@ -38,7 +38,7 @@ VQVAE_CKPT = "/kaggle/input/models/leonardocostantini02/modeels/pytorch/default/
 TOKEN_CKPT = "/kaggle/input/models/leonardocostantini02/modeels/pytorch/default/1/transformer_prior_checkpoint.pth"
 FRAME_CKPT = "/kaggle/input/models/leonardocostantini02/modeels2/pytorch/default/1/frame_prior_checkpoint.pth"
 
-DATASET_CACHE = "data/raw_frames_50k.npz"
+DATASET_CACHE = "/kaggle/input/datasets/leonardocostantini02/dataseets/raw_frames_50k.npz"
 NUM_CONTEXTS = 50         # how many starting contexts to test
 SEQ_LEN = 8               # context length (frames)
 ROLLOUT_STEPS = 15        # how many future frames to predict
