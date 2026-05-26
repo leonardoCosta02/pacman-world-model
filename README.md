@@ -70,7 +70,7 @@ The simplest way to reproduce all results is by running the notebook in a pre-co
    - `leonardocostantini02/modeels2` (Frame Prior)
    - `leonardocostantini02/modeels3` (Generated GIFs)
    - `leonardocostantini02/dataseets` (50k frame dataset cache)
-4. Set the secret `GITHUB_TOKEN` (for cloning the private repo) and optionally `WANDB_API_KEY`
+4. Set optionally `WANDB_API_KEY`
 5. Run all cells
 
 ### Option 2 — Google Colab
