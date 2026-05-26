@@ -33,8 +33,8 @@ from src.transformers import TransformerPrior, FrameLevelPrior
 
 
 # ---------- CONFIG ----------
-# Percorsi diretti ai Kaggle Datasets caricati
-VQVAE_CKPT = "/kaggle/input/models/leonardocostantini02/modeels/pytorch/default/1/vqvae.pth"
+
+VQVAE_CKPT = "/kaggle/input/models/leonardocostantini02/modeels/pytorch/default/1/vqvae_checkpoint.pth"
 TOKEN_CKPT = "/kaggle/input/models/leonardocostantini02/modeels/pytorch/default/1/transformer_prior_checkpoint.pth"
 FRAME_CKPT = "/kaggle/input/models/leonardocostantini02/modeels2/pytorch/default/1/frame_prior_checkpoint.pth"
 
