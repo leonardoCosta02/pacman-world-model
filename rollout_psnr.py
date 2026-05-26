@@ -33,10 +33,11 @@ from src.transformers import TransformerPrior, FrameLevelPrior
 
 
 # ---------- CONFIG ----------
-CKPT_DIR = "checkpoints"
-VQVAE_CKPT = os.path.join(CKPT_DIR, "vqvae.pth")
-TOKEN_CKPT = os.path.join(CKPT_DIR, "transformer_prior_checkpoint.pth")
-FRAME_CKPT = os.path.join(CKPT_DIR, "frame_prior_checkpoint.pth")
+# Percorsi diretti ai Kaggle Datasets caricati
+VQVAE_CKPT = "/kaggle/input/models/leonardocostantini02/modeels/pytorch/default/1/vqvae.pth"
+TOKEN_CKPT = "/kaggle/input/models/leonardocostantini02/modeels/pytorch/default/1/transformer_prior_checkpoint.pth"
+FRAME_CKPT = "/kaggle/input/models/leonardocostantini02/modeels2/pytorch/default/1/frame_prior_checkpoint.pth"
+
 DATASET_CACHE = "data/raw_frames_50k.npz"
 NUM_CONTEXTS = 50         # how many starting contexts to test
 SEQ_LEN = 8               # context length (frames)
@@ -171,8 +172,8 @@ def rollout_frame_prior(ctx_frames, frame_prior, vqvae, n_steps, device):
 
     pred_frames = []
     for step in range(n_steps):
-        z_next = frame_prior(z_hist)              # [1, 64, 10, 10]
-        z_q, _ = vqvae.vq(z_next)                 # anchor to codebook (riduce drift)
+        z_next = frame_prior(z_hist)               # [1, 64, 10, 10]
+        z_q, _ = vqvae.vq(z_next)                  # anchor to codebook (riduce drift)
         frame_img = vqvae.decoder(z_q).squeeze(0)  # [1, 80, 80]
         pred_frames.append(frame_img.cpu())
         # update history (sliding window)
