@@ -32,7 +32,6 @@ from src.transformers import TransformerPrior, FrameLevelPrior
 
 
 # ---------- CONFIG ----------
-
 VQVAE_CKPT = "/kaggle/input/models/leonardocostantini02/modeels/pytorch/default/1/vqvae_checkpoint.pth"
 TOKEN_CKPT = "/kaggle/input/models/leonardocostantini02/modeels/pytorch/default/1/transformer_prior_checkpoint.pth"
 FRAME_CKPT = "/kaggle/input/models/leonardocostantini02/modeels2/pytorch/default/1/frame_prior_checkpoint.pth"
@@ -249,7 +248,7 @@ def main():
     print("PSNR (dB) vs rollout step, averaged over", NUM_CONTEXTS, "contexts")
     print("="*70)
     print(f"{'step':>4} | {'Token mean ± std':>20} | {'Frame mean ± std':>20}")
-    print("-"*70)
+    print("-" * 70)
     for t in range(ROLLOUT_STEPS):
         print(f"{t+1:>4} | {psnr_token_mean[t]:>10.2f} ± {psnr_token_std[t]:>5.2f}    | "
               f"{psnr_frame_mean[t]:>10.2f} ± {psnr_frame_std[t]:>5.2f}")
@@ -273,4 +272,22 @@ def main():
         json.dump(out, f, indent=2)
     print("\n✓ Saved rollout_psnr_curves.json")
 
-    #
+    # Plot
+    steps = np.arange(1, ROLLOUT_STEPS + 1)
+    plt.figure(figsize=(7, 4.5))
+    plt.errorbar(steps, psnr_token_mean, yerr=psnr_token_std,
+                 label='Token-level Prior', marker='o', capsize=3, linewidth=2)
+    plt.errorbar(steps, psnr_frame_mean, yerr=psnr_frame_std,
+                 label='Frame-level Prior', marker='s', capsize=3, linewidth=2)
+    plt.xlabel('Rollout step $t$')
+    plt.ylabel('PSNR (dB) vs ground truth')
+    plt.title(f'Autoregressive rollout quality (n={NUM_CONTEXTS} contexts)')
+    plt.legend()
+    plt.grid(alpha=0.3)
+    plt.tight_layout()
+    plt.savefig('rollout_psnr.png', dpi=150)
+    print("✓ Saved rollout_psnr.png")
+
+
+if __name__ == "__main__":
+    main()
