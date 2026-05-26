@@ -12,7 +12,10 @@ The labels (SAFE vs DANGER) are obtained via **look-ahead self-supervision**: a 
 
 ---
 
-## Project Structurepacman-world-model/
+## Project Structure
+
+````
+pacman-world-model/
 ├── src/                              # Modular source code
 │   ├── utils.py                      # set_seed, make_averager, helpers
 │   ├── dataset.py                    # Frame collection, PyTorch Datasets, DataLoaders
@@ -38,6 +41,12 @@ The labels (SAFE vs DANGER) are obtained via **look-ahead self-supervision**: a 
 ├── train_vqvae.py                    # VQ-VAE training script
 ├── train_transformer.py              # Temporal Transformer training script
 ├── train_token_prior.py              # Token-level Prior training script
+├── train_frame_prior.py              # Frame-level Prior training script
+├── test.py                           # Evaluation script
+└── requirements.txt                  # Python dependencies
+````
+
+> **Note**: The notebook acts as a minimal launcher that imports the code from `src/` and runs the training/evaluation pipelines as subprocesses. The core architecture and logic strictly reside in the modular Python files.
 > **Note**: The notebook acts as a minimal launcher that imports the code from `src/` and runs the training/evaluation pipelines as subprocesses. The core architecture and logic strictly reside in the modular Python files.
 
 ---
@@ -69,7 +78,7 @@ The simplest way to reproduce all results is by running the notebook in a pre-co
 1. Open `notebook/PacMan_WorldModel.ipynb` on Colab
 2. Enable a GPU runtime (`Runtime → Change runtime type → T4 GPU`)
 3. Mount Google Drive and place the pre-trained weights in `/content/drive/MyDrive/pacman-pesi/`. The weights folder is available here:
-   - **[Pre-trained weights (Google Drive)]()** *(public)*
+   - **[Pre-trained weights (Google Drive)](https://drive.google.com/drive/folders/1-xMEXMLGdC1u5SMr4qf8qOoH15-nyaRy?usp=drive_link)** *(public)*
 4. Set the Colab secret `GITHUB_TOKEN` (and optionally `WANDB_API_KEY`)
 5. Run all cells
 
