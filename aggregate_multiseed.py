@@ -7,7 +7,6 @@ USAGE:
 
 Produces:
   - Console output with mean ± std
-  - LaTeX table ready to paste into the report
   - aggregated_metrics.json
 """
 import json
@@ -63,48 +62,6 @@ def main():
             label = metric.replace('_', ' ').title()
             print(f"  {label:20s}: {mean:.4f} ± {std:.4f}   (runs: {[f'{v:.4f}' for v in vals]})")
         results[model] = m
-
-    # ============== LaTeX OUTPUT ==============
-    print("\n" + "="*80)
-    print("LaTeX TABLE READY TO PASTE INTO THE REPORT")
-    print("="*80)
-    
-    def fmt(metric_dict, metric_name, scale=100, dec=2):
-        mean = metric_dict[metric_name]['mean'] * scale
-        std = metric_dict[metric_name]['std'] * scale
-        return f"{mean:.{dec}f} \\pm {std:.{dec}f}"
-    
-    def fmt_f1(metric_dict, metric_name, dec=3):
-        mean = metric_dict[metric_name]['mean']
-        std = metric_dict[metric_name]['std']
-        return f"{mean:.{dec}f} \\pm {std:.{dec}f}"
-
-    rows = []
-    if 'baseline' in results:
-        m = results['baseline']
-        rows.append(("Baseline (1 frame, continuous)", fmt(m, 'accuracy'), fmt_f1(m, 'f1_danger')))
-    if 'vqvae' in results:
-        m = results['vqvae']
-        rows.append(("VQ-VAE (1 frame, discrete)", fmt(m, 'accuracy'), fmt_f1(m, 'f1_danger')))
-    if 'transformer' in results:
-        m = results['transformer']
-        rows.append(("Temporal Transformer (8 frames)", fmt(m, 'accuracy'), fmt_f1(m, 'f1_danger')))
-
-    print(r"""
-\begin{table}[h]
-\caption{Test-set performance, averaged over 3 random seeds (mean $\pm$ std).}
-\label{tab:results}
-\centering
-\small
-\begin{tabular}{lcc}
-\toprule
-Model & Accuracy (\%) & F1 (DANGER) \\
-\midrule""")
-    for name, acc_s, f1_s in rows:
-        print(f"{name} & ${acc_s}$ & ${f1_s}$ \\\\")
-    print(r"""\bottomrule
-\end{tabular}
-\end{table}""")
 
     # Save aggregated json
     out_path = os.path.join(CKPT_DIR, "aggregated_metrics.json")
