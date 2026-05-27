@@ -1,146 +1,96 @@
 # Multitask World Model for Ms. Pac-Man
 
-Project developed for the **Deep Learning & Applied AI (DLAI) 2025/2026** course at Sapienza University of Rome, under the supervision of Prof. Emanuele Rodolà.
+Project for the course **Deep Learning & Applied AI (DLAI)**, a.y. 2025/26 — Sapienza University of Rome, Prof. Emanuele Rodolà.
+
+This project investigates the trade-off between continuous and discrete latent spaces for a multitask world model on Ms. Pac-Man, evaluating five architectures progressively extended from a shared encoder toward full autoregressive future simulation.
 
 ---
 
-## Overview
+## Research Question
 
-A multitask system based on a shared **Encoder** and two task-specific heads (**Decoder** + **Classifier**), progressively extended with a **VQ-VAE**, a **Temporal Transformer**, and two autoregressive generative models (**Token-level Prior** and **Frame-level Prior**). The system builds a *World Model* capable of encoding, reconstructing, classifying, and generating future frames of the Ms. Pac-Man arcade game.
+Given a severely class-imbalanced, non-Markovian prediction task on raw Atari frames, when does a discrete codebook outperform a continuous bottleneck, and can a Temporal Transformer bridge the gap between single-frame snapshots and predictive look-ahead labels?
 
-The labels (SAFE vs DANGER) are obtained via **look-ahead self-supervision**: a frame is marked DANGER if Pac-Man loses a life within the next 15 frames. Labels are therefore **predictive**, not descriptive — this motivates the introduction of temporal models such as the Temporal Transformer Classifier.
+---
+
+## Models
+
+The system is organized as five models, each motivated by a limitation of the previous one:
+
+**M1 — Baseline.** Shared 3-layer CNN encoder with a reconstruction decoder (MSE) and a binary classifier (BCE). Labels are obtained via look-ahead self-supervision: a frame at time *t* is marked DANGER if a life is lost within the next 15 frames. Establishes the continuous-latent reference.
+
+**M2 — VQ-VAE.** Replaces the continuous bottleneck with a discrete 128-token codebook (d=64), updated via EMA to prevent index collapse. Adds a cross-entropy classification head on the quantized grid.
+
+**M3 — Temporal Transformer Classifier.** Processes 8-frame histories of frozen VQ-VAE grids with a 4-layer self-attention encoder and a learnable [CLS] token, directly targeting the non-Markovian label.
+
+**M4 — Token-level Prior.** Causal Transformer decoder predicting 800 flattened tokens autoregressively (100 tokens/frame × 8 frames) via top-k sampling with scheduled sampling and noise injection to mitigate exposure bias.
+
+**M5 — Frame-level Prior.** Transformer encoder predicting the next 64×10×10 unquantized latent in a single pass (MSE objective), trading stochasticity for geometric coherence.
 
 ---
 
 ## Project Structure
 
-````
+```
 pacman-world-model/
-├── src/                              # Modular source code
-│   ├── utils.py                      # set_seed, make_averager, helpers
-│   ├── dataset.py                    # Frame collection, PyTorch Datasets, DataLoaders
-│   ├── models.py                     # Baseline, VectorQuantizer, VQ-VAE
-│   └── transformers.py               # Temporal Classifier, Token Prior, Frame Prior
-│
-├── conf/                             # Hydra configurations
-│   ├── config.yaml                   # Main config
-│   ├── model/                        # Per-model hyperparameters
-│   │   ├── baseline.yaml
-│   │   ├── vqvae.yaml
-│   │   ├── transformer_classifier.yaml
-│   │   ├── token_prior.yaml
-│   │   └── frame_prior.yaml
-│   └── dataset/                      # Dataset configs (10k, 50k frames)
-│       ├── pacman_10k.yaml
-│       └── pacman_50k.yaml
-│
+├── src/
+│   ├── utils.py                # set_seed, make_averager, helpers
+│   ├── dataset.py              # Frame collection, Datasets, DataLoaders
+│   ├── models.py               # Baseline, VectorQuantizer, VQ-VAE
+│   └── transformers.py         # Temporal Classifier, Token Prior, Frame Prior
+├── conf/
+│   ├── config.yaml             # Main Hydra config
+│   ├── model/                  # Per-model hyperparameters (5 yaml files)
+│   └── dataset/                # Dataset configs (10k, 50k frames)
 ├── notebook/
-│   └── PacMan_WorldModel.ipynb       # Main interactive notebook (launcher)
-│
-├── train_baseline.py                 # Baseline training script
-├── train_vqvae.py                    # VQ-VAE training script
-├── train_transformer.py              # Temporal Transformer training script
-├── train_token_prior.py              # Token-level Prior training script
-├── train_frame_prior.py              # Frame-level Prior training script
-├── test.py                           # Evaluation script
-└── requirements.txt                  # Python dependencies
-````
+│   └── PacMan_WorldModel.ipynb # Launcher notebook (Kaggle / Colab / local)
+├── train_baseline.py
+├── train_vqvae.py
+├── train_transformer.py
+├── train_token_prior.py
+├── train_frame_prior.py
+├── rollout_psnr.py             # Quantitative PSNR rollout comparison (Kaggle paths)
+├── test.py
+└── requirements.txt
+```
 
-> **Note**: The notebook acts as a minimal launcher that imports the code from `src/` and runs the training/evaluation pipelines as subprocesses. The core architecture and logic strictly reside in the modular Python files.
-> **Note**: The notebook acts as a minimal launcher that imports the code from `src/` and runs the training/evaluation pipelines as subprocesses. The core architecture and logic strictly reside in the modular Python files.
+> The notebook is a minimal launcher that clones the repo, installs dependencies, loads pre-trained weights, and runs evaluations as subprocesses. All architecture and logic reside in the modular `src/` files.
 
 ---
 
-## Quick Start (Recommended)
-
-The simplest way to reproduce all results is by running the notebook in a pre-configured environment (Kaggle or Google Colab). The notebook automatically:
-
-1. Detects the environment (Kaggle / Colab / local)
-2. Clones the repository from GitHub
-3. Installs missing dependencies
-4. Loads pre-trained weights from the corresponding source
-5. Runs all evaluations, latent interpolations, and generative rollouts
-
-### Option 1 — Kaggle (recommended)
-
-1. Upload `notebook/PacMan_WorldModel.ipynb` to Kaggle
-2. Enable a **T4 GPU** accelerator
-3. Attach the following public Kaggle Models / Datasets via *Add Input*:
-   - `leonardocostantini02/modeels` (VQ-VAE, Token Prior, Classifier)
-   - `leonardocostantini02/modeels2` (Frame Prior)
-   - `leonardocostantini02/modeels3` (Generated GIFs)
-   - `leonardocostantini02/dataseets` (50k frame dataset cache)
-4. Set optionally `WANDB_API_KEY`
-5. Run all cells
-
-### Option 2 — Google Colab
-
-1. Open `notebook/PacMan_WorldModel.ipynb` on Colab
-2. Enable a GPU runtime (`Runtime → Change runtime type → T4 GPU`)
-3. Mount Google Drive and place the pre-trained weights in `/content/drive/MyDrive/pacman-pesi/`. The weights folder is available here:
-   - **[Pre-trained weights (Google Drive)](https://drive.google.com/drive/folders/1-xMEXMLGdC1u5SMr4qf8qOoH15-nyaRy?usp=drive_link)** *(public)*
-4. Set the Colab secret `GITHUB_TOKEN` (and optionally `WANDB_API_KEY`)
-5. Run all cells
-
-### Option 3 — Local execution
+## Setup
 
 ```bash
 git clone https://github.com/leonardoCosta02/pacman-world-model.git
 cd pacman-world-model
 pip install -r requirements.txt
-jupyter notebook notebook/PacMan_WorldModel.ipynb
 ```
 
-For local execution, place the pre-trained weights inside a `checkpoints/` folder at the repository root. The required files are listed below.
+Training requires a GPU (all experiments run on a free Kaggle/Colab T4). Local CPU is sufficient only for analysis.
 
 ---
 
-## Pre-trained Weights
+## Reproducing the Experiments
 
-To run the notebook without retraining (≈3 hours on a T4 GPU), the following files are required:
-
-| File | Description |
-| :--- | :--- |
-| `baseline_checkpoint.pth` | Baseline `PacmanWorldModel` |
-| `vqvae_checkpoint.pth` | VQ-VAE with 128-token codebook |
-| `transformer_classifier_checkpoint.pth` | Temporal Transformer Classifier |
-| `transformer_prior_checkpoint.pth` | Token-level Prior |
-| `frame_prior_checkpoint.pth` | Frame-level Prior |
-| `raw_frames_50k.npz` | Cached 50k frame dataset |
-| `pacman_dream.gif` | Token-level rollout GIF |
-| `pacman_dream_framelevel.gif` | Frame-level rollout GIF |
-
-All weights are publicly available on:
-
-- **Google Drive (`pacman-pesi` folder):** [Download here](https://drive.google.com/drive/folders/1-xMEXMLGdC1u5SMr4qf8qOoH15-nyaRy?usp=drive_link)
-- **Kaggle Models / Datasets:** `leonardocostantini02/modeels`, `modeels2`, `modeels3`, `dataseets`
-
----
-
-## Manual Training (Optional)
-
-If you wish to retrain the models from scratch instead of using the pre-trained weights, run the scripts in the following order. Each model depends on the previous one (the Transformers reuse the frozen VQ-VAE as feature extractor):
+Run scripts in dependency order; each model requires the previous checkpoint as a frozen feature extractor:
 
 ```bash
-# 1. Baseline multitask model (10 epochs, ~3 min on T4)
+# M1 — Baseline (10 epochs, ~3 min on T4)
 python train_baseline.py
 
-# 2. VQ-VAE (50 epochs, ~25 min on T4)
+# M2 — VQ-VAE (50 epochs, ~25 min on T4)
 python train_vqvae.py
 
-# 3. Temporal Transformer Classifier (10 epochs, ~10 min)
+# M3 — Temporal Transformer Classifier (10 epochs, ~10 min on T4)
 python train_transformer.py
 
-# 4. Token-level Prior (50 epochs, ~45 min)
+# M4 — Token-level Prior (50 epochs, ~45 min on T4)
 python train_token_prior.py
 
-# 5. Frame-level Prior on 50k dataset (30 epochs, ~30 min)
+# M5 — Frame-level Prior on 50k dataset (30 epochs, ~30 min on T4)
 python train_frame_prior.py dataset=pacman_50k
 ```
 
-### Evaluation
-
-To evaluate any of the classifiers on the test set:
+Evaluate classifiers on the test set:
 
 ```bash
 python test.py model=baseline
@@ -148,48 +98,90 @@ python test.py model=vqvae
 python test.py model=transformer_classifier
 ```
 
+Quantitative PSNR rollout comparison (requires Kaggle paths configured in `rollout_psnr.py`):
+
+```bash
+python rollout_psnr.py
+```
+
 ---
 
-## Experimental Results
+## Pre-trained Weights
 
-### Classification
+To reproduce all results without retraining, attach the following resources on Kaggle or download from Google Drive:
 
-Adding temporal context drastically improves detection of the rare **DANGER** class, significantly reducing false positives while preserving recall.
+| File | Description |
+| :--- | :--- |
+| `baseline_checkpoint.pth` | Baseline `PacmanWorldModel` |
+| `vqvae_checkpoint.pth` | VQ-VAE, K=128 codebook |
+| `transformer_classifier_checkpoint.pth` | Temporal Transformer Classifier |
+| `transformer_prior_checkpoint.pth` | Token-level Prior |
+| `frame_prior_checkpoint.pth` | Frame-level Prior |
+| `raw_frames_50k.npz` | Cached 50k-frame dataset |
+| `pacman_dream.gif` | Token-level autoregressive rollout |
+| `pacman_dream_framelevel.gif` | Frame-level autoregressive rollout |
 
-| Model | Input | Test Accuracy | F1 (DANGER) |
+**Kaggle** (recommended): attach via *Add Input*:
+- `leonardocostantini02/modeels` — VQ-VAE, Token Prior, Classifier
+- `leonardocostantini02/modeels2` — Frame Prior
+- `leonardocostantini02/modeels3` — Generated GIFs
+- `leonardocostantini02/dataseets` — 50k frame dataset cache
+
+**Google Drive**: [pacman-pesi folder (public)](https://drive.google.com/drive/folders/1-xMEXMLGdC1u5SMr4qf8qOoH15-nyaRy?usp=drive_link) — place under `checkpoints/` for local execution or `/content/drive/MyDrive/pacman-pesi/` for Colab.
+
+---
+
+## Results
+
+Performance averaged over 3 independent random seeds (seed ∈ {42, 43, 44}):
+
+| Model | Input | Accuracy (%) | F1 (DANGER) |
 | :--- | :--- | :--- | :--- |
-| Baseline (continuous latent) | 1 frame | 92.40% | 0.62 |
-| VQ-VAE (discrete latent) | 1 frame | 96.00% | 0.76 |
-| **Temporal Transformer** | **8 frames** | **97.85%** | **0.83** |
+| Baseline (continuous) | 1 frame | 92.02 ± 1.13 | 0.60 ± 0.03 |
+| VQ-VAE (discrete) | 1 frame | 96.25 ± 0.23 | 0.76 ± 0.01 |
+| **Temporal Transformer** | **8 frames** | **98.32 ± 0.78** | **0.87 ± 0.06** |
+| VQ-VAE + 20% L1 pruning | 1 frame | 96.25 ± 0.23 | 0.76 ± 0.01 |
 
-**Inference benchmark:** The Temporal Transformer processes 8-frame sequences in **1.59 ms** on a T4 GPU (629 sequences/sec), with a 10× safety margin against the native 60 FPS refresh rate.
+**Pruning.** 20% unstructured L1 magnitude pruning of the VQ-VAE encoder leaves downstream accuracy unchanged (Δ = 0.00%). Sparsity is non-uniform: deepest layer reaches 23.0%, while early edge-detectors are pruned only 2.9%, indicating over-parameterization in the discrete topological mapping.
 
-### Pruning
+**Autoregressive rollouts.** PSNR measured over 15 steps across 50 unseen contexts: the token-level prior collapses to 14.33 ± 0.12 dB at step 1 due to categorical drift; the frame-level prior stabilizes at 30.79 ± 2.98 dB after 15 steps but biases moving agents toward the conditional mean (entity vanishing).
 
-Applying **20% L1 Unstructured Global Pruning** to the VQ-VAE encoder leaves downstream accuracy completely intact (97.85% → 97.85%, Δ = 0.00%). The pruning is non-uniform across layers (largest layer: 23.0% sparse, first layer: 2.9% sparse), indicating healthy over-parameterization and robustness of the learned features.
-
-### Generative Priors
-
-- **Token-level Prior** generates 100 tokens per frame autoregressively. Locally coherent structures emerge in the first 1–2 frames, but exposure bias and categorical drift produce noise after ~200 autoregressive steps.
-- **Frame-level Prior** generates entire latents in a single pass, maintaining coherent maze structures for 15+ steps. However, the deterministic MSE objective induces regression-to-the-mean, slightly blurring moving entities (Pac-Man, ghosts).
-
-The two priors illustrate a classical trade-off in autoregressive generative models: **fine granularity + stochastic sampling** (Token Prior) versus **global operation + deterministic prediction** (Frame Prior).
+**Inference latency.** The Temporal Transformer processes 8-frame sequences in 1.48 ms on T4 GPU (675 sequences/s), satisfying 60 FPS real-time constraints with a 10× safety margin.
 
 ---
 
 ## Reproducibility
 
-All random seeds are strictly set to **42** (`numpy`, `random`, `torch`, `cuda`, and deterministic `cudnn`). Train/test splits and `WeightedRandomSampler` instances use explicit PyTorch `Generator` objects. Model initialization is re-seeded immediately before instantiation, guaranteeing perfectly reproducible weights regardless of execution order.
+All seeds are fixed to 42 (`random`, `numpy`, `torch`, `cuda`, `cudnn.deterministic = True`). Train/test splits and `WeightedRandomSampler` instances use explicit `torch.Generator` objects. Multi-seed variants (`train_*_multiseed.py`) and result aggregation (`aggregate_multiseed.py`) are provided for the reported ± std metrics.
 
-Subprocess-based training in the notebook may show small (±1.5%) accuracy variations on the Baseline due to RNG state isolation between the parent kernel and the launched script.
+---
+
+## References
+
+- Ha & Schmidhuber. *Recurrent World Models Facilitate Policy Evolution.* NeurIPS 2018.
+- van den Oord, Vinyals & Kavukcuoglu. *Neural Discrete Representation Learning.* NeurIPS 2017.
+- Vaswani et al. *Attention Is All You Need.* NeurIPS 2017.
+- Devlin et al. *BERT: Pre-training of Deep Bidirectional Transformers.* NAACL-HLT 2019.
+- Micheli, Alonso & Fleuret. *Transformers are Sample-Efficient World Models.* ICLR 2023.
+- Hafner et al. *Mastering Diverse Domains through World Models.* arXiv 2301.04104, 2023.
+- Esser, Rombach & Ommer. *Taming Transformers for High-Resolution Image Synthesis.* CVPR 2021.
+- Kingma & Welling. *Auto-Encoding Variational Bayes.* ICLR 2014.
+- Bengio et al. *Scheduled Sampling for Sequence Prediction with RNNs.* NeurIPS 2015.
+- Han et al. *Learning both Weights and Connections for Efficient Neural Networks.* NeurIPS 2015.
+- Frankle & Carbin. *The Lottery Ticket Hypothesis.* ICLR 2019.
+- Bellemare et al. *The Arcade Learning Environment.* JAIR 47, 2013.
+- Towers et al. *Gymnasium.* https://gymnasium.farama.org, 2023.
+- Caruana. *Multitask Learning.* Machine Learning 28(1), 1997.
+
+---
+
+## AI Usage
+
+In accordance with course guidelines, Google's Gemini was used as a coding and writing assistant to: (i) generate boilerplate PyTorch code and Hydra configurations for the five evaluated architectures; (ii) assist in debugging tensor shape mismatches during Kaggle deployments; (iii) correct grammar and improve the conciseness of the report manuscript. All core design decisions — model selection, the non-Markovian labelling scheme, the pruning experiments, and the formulation of the generative priors — were independently conceived. All numerical results were generated from independent executions on Kaggle GPUs and verified against the released checkpoints.
 
 ---
 
 ## Author
 
-**Leonardo Costantini** — Computer Science Student  
-Sapienza University of Rome  
-Deep Learning & Applied AI (2025/2026)
-├── train_frame_prior.py              # Frame-level Prior training script
-├── test.py                           # Evaluation script
-└── requirements.txt                  # Python dependencies
+**Leonardo Costantini** — Computer Science Student, Sapienza University of Rome
+`costantini.2009905@studenti.uniroma1.it`
