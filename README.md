@@ -133,7 +133,7 @@ To reproduce all results without retraining, attach the following resources on K
 
 ## Results
 
-Performance averaged over 3 independent random seeds (seed ∈ {42, 43, 44}):
+Performance averaged over 3 independent random seeds (seed ∈ {7, 42, 123}):
 
 | Model | Input | Accuracy (%) | F1 (DANGER) |
 | :--- | :--- | :--- | :--- |
