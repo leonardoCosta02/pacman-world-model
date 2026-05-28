@@ -140,9 +140,14 @@ Performance averaged over 3 independent random seeds (seed ∈ {7, 42, 123}):
 | Baseline (continuous) | 1 frame | 92.02 ± 1.13 | 0.60 ± 0.03 |
 | VQ-VAE (discrete) | 1 frame | 96.25 ± 0.23 | 0.76 ± 0.01 |
 | **Temporal Transformer** | **8 frames** | **98.32 ± 0.78** | **0.87 ± 0.06** |
-| VQ-VAE + 20% L1 pruning | 1 frame | 96.25 ± 0.23 | 0.76 ± 0.01 |
+| VQ-VAE + 20% L1 pruning | 1 frame | 96.38 ± 0.60 | 0.76 ± 0.03 |
 
-**Pruning.** 20% unstructured L1 magnitude pruning of the VQ-VAE encoder leaves downstream accuracy unchanged (Δ = 0.00%). Sparsity is non-uniform: deepest layer reaches 23.0%, while early edge-detectors are pruned only 2.9%, indicating over-parameterization in the discrete topological mapping.
+**Pruning.** 20% unstructured L1 magnitude pruning of the VQ-VAE encoder 
+yields $\Delta = +0.13 \pm 0.65$ pp across three seeds, confirming no 
+statistically significant accuracy degradation. Sparsity is uniform across 
+all convolutional layers (~20%), suggesting that the discrete codebook 
+representation does not exhibit the hierarchical redundancy typically 
+observed in continuous encoders.
 
 **Autoregressive rollouts.** PSNR measured over 15 steps across 50 unseen contexts: the token-level prior collapses to 14.33 ± 0.12 dB at step 1 due to categorical drift; the frame-level prior stabilizes at 30.79 ± 2.98 dB after 15 steps but biases moving agents toward the conditional mean (entity vanishing).
 
