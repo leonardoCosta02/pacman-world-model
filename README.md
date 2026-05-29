@@ -53,7 +53,7 @@ pacman-world-model/
 └── requirements.txt
 ```
 
-> The notebook is a minimal launcher that clones the repo, installs dependencies, loads pre-trained weights, and runs evaluations as subprocesses. All architecture and logic reside in the modular `src/` files.
+> The notebook is a launcher that clones the repo, installs dependencies, loads pre-trained weights, and runs evaluations as subprocesses. All architecture and logic reside in the modular src/ files.
 
 ---
 
