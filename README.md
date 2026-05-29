@@ -148,7 +148,7 @@ statistically significant accuracy degradation. Global L1 pruning concentrates o
 
 **Autoregressive rollouts.** PSNR measured over 15 steps across 50 unseen contexts: the token-level prior collapses to 14.33 ± 0.12 dB at step 1 due to categorical drift; the frame-level prior stabilizes at 30.79 ± 2.98 dB after 15 steps but biases moving agents toward the conditional mean (entity vanishing).
 
-**Inference latency.** The Temporal Transformer processes 8-frame sequences in 1.48 ms on T4 GPU (675 sequences/s), satisfying 60 FPS real-time constraints with a 10× safety margin.
+**Inference latency.** The Temporal Transformer processes 8-frame sequences in 1.45  ms on T4 GPU (690 sequences/s), satisfying 60 FPS real-time constraints with a 10× safety margin.
 
 ---
 
