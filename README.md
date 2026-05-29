@@ -144,10 +144,7 @@ Performance averaged over 3 independent random seeds (seed ∈ {7, 42, 123}):
 
 **Pruning.** 20% unstructured L1 magnitude pruning of the VQ-VAE encoder 
 yields $\Delta = +0.13 \pm 0.65$ pp across three seeds, confirming no 
-statistically significant accuracy degradation. Sparsity is uniform across 
-all convolutional layers (~20%), suggesting that the discrete codebook 
-representation does not exhibit the hierarchical redundancy typically 
-observed in continuous encoders.
+statistically significant accuracy degradation. Global L1 pruning concentrates on the deepest convolutional layer (23% sparsity) while barely touching the early edge-detectors (2.9%), indicating high redundancy in the encoder's mapping into the codebook.
 
 **Autoregressive rollouts.** PSNR measured over 15 steps across 50 unseen contexts: the token-level prior collapses to 14.33 ± 0.12 dB at step 1 due to categorical drift; the frame-level prior stabilizes at 30.79 ± 2.98 dB after 15 steps but biases moving agents toward the conditional mean (entity vanishing).
 
