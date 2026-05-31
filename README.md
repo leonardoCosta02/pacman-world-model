@@ -154,8 +154,7 @@ statistically significant accuracy degradation. Global L1 pruning concentrates o
 
 ## Reproducibility
 
-All seeds are fixed to 42 (`random`, `numpy`, `torch`, `cuda`, `cudnn.deterministic = True`). Train/test splits and `WeightedRandomSampler` instances use explicit `torch.Generator` objects. Multi-seed variants (`train_*_multiseed.py`) and result aggregation (`aggregate_multiseed.py`) are provided for the reported ± std metrics.
-
+Single runs fix all seeds to 42 (`random`, `numpy`, `torch`, `cuda`, `cudnn.deterministic = True`); the reported ± std metrics come from multi-seed runs over {7, 42, 123}. Train/test splits and `WeightedRandomSampler` instances use explicit `torch.Generator` objects. The multi-seed variants (`train_*_multiseed.py`) and result aggregation (`aggregate_multiseed.py`) reproduce these numbers.
 ---
 
 ## References
