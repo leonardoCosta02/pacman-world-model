@@ -33,22 +33,27 @@ The system is organized as five models, each motivated by a limitation of the pr
 ```
 pacman-world-model/
 ├── src/
-│   ├── utils.py                # set_seed, make_averager, helpers
-│   ├── dataset.py              # Frame collection, Datasets, DataLoaders
-│   ├── models.py               # Baseline, VectorQuantizer, VQ-VAE
-│   └── transformers.py         # Temporal Classifier, Token Prior, Frame Prior
+│   ├── utils.py                     # set_seed, make_averager, helpers
+│   ├── dataset.py                   # Frame collection, Datasets, DataLoaders
+│   ├── models.py                    # Baseline, VectorQuantizer, VQ-VAE
+│   └── transformers.py              # Temporal Classifier, Token Prior, Frame Prior
 ├── conf/
-│   ├── config.yaml             # Main Hydra config
-│   ├── model/                  # Per-model hyperparameters (5 yaml files)
-│   └── dataset/                # Dataset configs (10k, 50k frames)
+│   ├── config.yaml                  # Main Hydra config
+│   ├── model/                       # Per-model hyperparameters (5 yaml files)
+│   └── dataset/                     # Dataset configs (10k, 50k frames)
 ├── notebook/
-│   └── PacMan_WorldModel.ipynb # Launcher notebook (Kaggle / Colab / local)
+│   └── PacMan_WorldModel.ipynb      # Launcher notebook (Kaggle / Colab / local)
 ├── train_baseline.py
 ├── train_vqvae.py
 ├── train_transformer.py
 ├── train_token_prior.py
 ├── train_frame_prior.py
-├── rollout_psnr.py             # Quantitative PSNR rollout comparison (Kaggle paths)
+├── train_baseline_multiseed.py      # Multi-seed variant (seeds 7/42/123)
+├── train_vqvae_multiseed.py         # Multi-seed variant
+├── train_transformer_multiseed.py   # Multi-seed variant
+├── aggregate_multiseed.py           # Aggregates per-seed metrics into mean ± std
+├── evaluate_pruning_multiseed.py    # Multi-seed 20% L1 pruning evaluation
+├── rollout_psnr.py                  # Quantitative PSNR rollout comparison (Kaggle paths)
 ├── test.py
 └── requirements.txt
 ```
