@@ -33,22 +33,27 @@ The system is organized as five models, each motivated by a limitation of the pr
 ```
 pacman-world-model/
 ├── src/
-│   ├── utils.py                # set_seed, make_averager, helpers
-│   ├── dataset.py              # Frame collection, Datasets, DataLoaders
-│   ├── models.py               # Baseline, VectorQuantizer, VQ-VAE
-│   └── transformers.py         # Temporal Classifier, Token Prior, Frame Prior
+│   ├── utils.py                     # set_seed, make_averager, helpers
+│   ├── dataset.py                   # Frame collection, Datasets, DataLoaders
+│   ├── models.py                    # Baseline, VectorQuantizer, VQ-VAE
+│   └── transformers.py              # Temporal Classifier, Token Prior, Frame Prior
 ├── conf/
-│   ├── config.yaml             # Main Hydra config
-│   ├── model/                  # Per-model hyperparameters (5 yaml files)
-│   └── dataset/                # Dataset configs (10k, 50k frames)
+│   ├── config.yaml                  # Main Hydra config
+│   ├── model/                       # Per-model hyperparameters (5 yaml files)
+│   └── dataset/                     # Dataset configs (10k, 50k frames)
 ├── notebook/
-│   └── PacMan_WorldModel.ipynb # Launcher notebook (Kaggle / Colab / local)
+│   └── PacMan_WorldModel.ipynb      # Launcher notebook (Kaggle / Colab / local)
 ├── train_baseline.py
 ├── train_vqvae.py
 ├── train_transformer.py
 ├── train_token_prior.py
 ├── train_frame_prior.py
-├── rollout_psnr.py             # Quantitative PSNR rollout comparison (Kaggle paths)
+├── train_baseline_multiseed.py      # Multi-seed variant (seeds 7/42/123)
+├── train_vqvae_multiseed.py         # Multi-seed variant
+├── train_transformer_multiseed.py   # Multi-seed variant
+├── aggregate_multiseed.py           # Aggregates per-seed metrics into mean ± std
+├── evaluate_pruning_multiseed.py    # Multi-seed 20% L1 pruning evaluation
+├── rollout_psnr.py                  # Quantitative PSNR rollout comparison (Kaggle paths)
 ├── test.py
 └── requirements.txt
 ```
@@ -154,7 +159,7 @@ statistically significant accuracy degradation. Global L1 pruning concentrates o
 
 ## Reproducibility
 
-All seeds are fixed to 42 (`random`, `numpy`, `torch`, `cuda`, `cudnn.deterministic = True`). Train/test splits and `WeightedRandomSampler` instances use explicit `torch.Generator` objects. Multi-seed variants (`train_*_multiseed.py`) and result aggregation (`aggregate_multiseed.py`) are provided for the reported ± std metrics.
+Single runs fix all seeds to 42 (`random`, `numpy`, `torch`, `cuda`, `cudnn.deterministic = True`); the reported ± std metrics come from multi-seed runs over {7, 42, 123}. Train/test splits and `WeightedRandomSampler` instances use explicit `torch.Generator` objects. The multi-seed variants (`train_*_multiseed.py`) and result aggregation (`aggregate_multiseed.py`) reproduce these numbers.
 
 ---
 
