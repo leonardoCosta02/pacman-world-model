@@ -43,6 +43,8 @@ pacman-world-model/
 │   └── dataset/                     # Dataset configs (10k, 50k frames)
 ├── notebook/
 │   └── PacMan_WorldModel.ipynb      # Launcher notebook (Kaggle / Colab / local)
+├── report/
+│   └── report.pdf                   # Project report (PDF)
 ├── train_baseline.py
 ├── train_vqvae.py
 ├── train_transformer.py
