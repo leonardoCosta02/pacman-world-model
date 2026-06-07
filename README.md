@@ -62,6 +62,8 @@ pacman-world-model/
 
 > The notebook is a launcher that clones the repo, installs dependencies, loads pre-trained weights, and runs evaluations as subprocesses. All architecture and logic reside in the modular src/ files.
 
+> > If GitHub's preview fails to render the notebook, view it via [nbviewer](https://nbviewer.org/github/leonardoCosta02/pacman-world-model/blob/main/notebook/PacMan_WorldModel.ipynb).
+
 ---
 
 ## Setup
